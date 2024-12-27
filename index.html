@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spin Chart</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+        }
+        #chartContainer {
+            width: 80%;
+            max-width: 600px;
+            height: 300px;
+            border: 1px solid #ccc;
+            position: relative;
+        }
+        .bar {
+            background-color: #4caf50;
+            position: absolute;
+            bottom: 0;
+            text-align: center;
+            color: white;
+            font-size: 0.8em;
+            transition: height 0.3s ease;
+        }
+        .axis {
+           display: flex;
+           justify-content: space-around;
+           width: 80%;
+           max-width: 600px;
+           border-bottom: 1px solid black;
+           padding-bottom: 5px;
+        }
+        .axis-label{
+            text-align: center;
+            font-size: 0.8em;
+             width: 10%;
+        }
+       .select-container{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        max-width: 600px;
+       }
+    </style>
+</head>
+<body>
+    <h1>Spin Count Per Day</h1>
+     <div class="select-container">
+     <label for="select-date">Select a Date</label>
+     <select id="select-date">
+     </select>
+    </div>
+    <div id="chartContainer">
+    </div>
+    <div id="chartAxis" class="axis">
+    </div>
+    <script>
+    const chartContainer = document.getElementById('chartContainer');
+        const chartAxis = document.getElementById('chartAxis');
+        const selectDate = document.getElementById("select-date");
+
+        let barWidth = 10;
+        const colors = ['#3498db', '#2ecc71', '#e74c3c', '#9b59b6', '#f1c40f', '#1abc9c', '#d35400'];
+
+         // Function to generate dates for the last 7 days
+        function getLast7Days() {
+          const dates = [];
+           for (let i = 6; i >= 0; i--) {
+             const date = new Date();
+             date.setDate(date.getDate() - i);
+            const formattedDate = date.toISOString().split('T')[0]; // Format as YYYY-MM-DD
+           dates.push(formattedDate);
+        }
+         return dates;
+        }
+
+        function createBar(date, spins, index) {
+            const maxSpins = 10; // Adjust as needed for your app.
+            const barHeight = Math.min(100, (spins / maxSpins) * 100);
+            const barElement = document.createElement('div');
+            barElement.classList.add('bar');
+            barElement.style.height = `${barHeight}%`;
+            barElement.style.left = `${(index * barWidth)}%`;
+             barElement.style.width = `${barWidth}%`;
+            barElement.style.backgroundColor = colors[index % colors.length];
+             barElement.textContent = spins;
+            return barElement;
+        }
+
+        function createAxisLabel(date) {
+            const axisLabel = document.createElement('div');
+            axisLabel.classList.add('axis-label');
+             const formattedDate = new Date(date).toLocaleDateString();
+             axisLabel.textContent = formattedDate;
+            return axisLabel;
+        }
+
+        function generateData() {
+            const dates = getLast7Days();
+            const data = dates.map((date, index) => ({
+                date: date,
+                spins: Math.floor(Math.random() * 10) + 1, // Random spins 1-10 for example
+            }));
+           return data;
+        }
+
+       function renderChart(data) {
+        chartContainer.innerHTML = '';
+           selectDate.innerHTML = "";
+            chartAxis.innerHTML = "";
+
+            data.forEach((item, index) => {
+                const bar = createBar(item.date, item.spins, index);
+                const axisLabel = createAxisLabel(item.date);
+                 const option = document.createElement("option");
+                 option.value = item.date;
+                 option.textContent =  new Date(item.date).toLocaleDateString();
+
+                selectDate.appendChild(option);
+                chartContainer.appendChild(bar);
+                chartAxis.appendChild(axisLabel);
+            });
+        }
+       const data = generateData();
+        renderChart(data);
+    </script>
+</body>
+</html>
